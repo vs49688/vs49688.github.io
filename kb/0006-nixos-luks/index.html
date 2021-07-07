@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>NixOS on a LUKS root drive</title>
+    <meta name="description" content="NixOS on a LUKS root drive">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="linux, nixos, luks">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> NixOS on a LUKS root drive</h1>
+        <hr>
+        
+        <i>2020-07-12</i>
+        
+        <hr>
+    </header>
+
+    <p>Most of this is from <a href="https://gist.github.com/martijnvermaat/76f2e24d0239470dd71050358b4d5134">here</a>, but tweaked for my setups.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># These was done in KVM, the process is the same</span>
+parted /dev/vda -- mklabel gpt
+
+<span style="color:#75715e"># Create the /boot partition</span>
+parted /dev/vda -- mkpart ESP fat32 1MiB 1024MiB
+parted /dev/vda -- set <span style="color:#ae81ff">1</span> boot on
+
+<span style="color:#75715e"># For some reason parted didn&#39;t do this properly</span>
+mkfs.vfat -F <span style="color:#ae81ff">32</span> /dev/vda1
+
+<span style="color:#75715e"># Set the rest of it for LVM</span>
+parted /dev/vda -- mkpart primary 1024MiB 100%
+
+<span style="color:#75715e">##</span>
+<span style="color:#75715e"># Setup LVM, will look like the following.</span>
+<span style="color:#75715e"># This was done in the Nix installer.</span>
+<span style="color:#75715e">#</span>
+<span style="color:#75715e"># [root@nixos:~]# lsblk</span>
+<span style="color:#75715e"># NAME          MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT</span>
+<span style="color:#75715e"># loop0           7:0    0 496.5M  1 loop  /nix/.ro-store</span>
+<span style="color:#75715e"># sr0            11:0    1   540M  0 rom   /iso</span>
+<span style="color:#75715e"># vda           253:0    0    15G  0 disk  </span>
+<span style="color:#75715e"># ├─vda1        253:1    0  1023M  0 part  </span>
+<span style="color:#75715e"># └─vda2        253:2    0    14G  0 part  </span>
+<span style="color:#75715e">#   └─enc-pv    254:0    0    14G  0 crypt </span>
+<span style="color:#75715e">#     ├─vg-root 254:1    0    13G  0 lvm   </span>
+<span style="color:#75715e">#     └─vg-swap 254:2    0     1G  0 lvm   </span>
+<span style="color:#75715e">##</span>
+
+cryptsetup luksFormat /dev/vda2
+cryptsetup luksOpen /dev/vda2 enc-pv
+pvcreate /dev/mapper/env-pv
+vgcreate vg /dev/mapper/enc-pv
+
+lvcreate -l <span style="color:#e6db74">&#39;100%FREE&#39;</span> -n root vg
+lvreduce -L -1GiB /dev/vg/root
+lvcreate -l <span style="color:#e6db74">&#39;100%FREE&#39;</span> -n swap vg
+
+<span style="color:#75715e"># Create the filesystems</span>
+mkfs.ext4 -L root /dev/vg/root
+mkswap -L swap /dev/vg/swap
+
+<span style="color:#75715e"># Mount the filesystems</span>
+mount /dev/vg/root /mnt
+mkdir -p /mnt/boot
+mount /dev/vda1 /mnt/boot
+swapon /dev/vg/swap
+
+<span style="color:#75715e"># Generate the initial config</span>
+nixos-generate-config --root /mnt
+
+<span style="color:#75715e"># Install NixOS</span>
+nixos-install
+</code></pre></div><h2 id="notes">Notes</h2>
+<h3 id="zfs">ZFS</h3>
+<ul>
+<li>NixOS wasn&rsquo;t prompting for a password on boot when using ZFS.</li>
+<li>I don&rsquo;t want to use a non-mainlined filesystem as a root drive.</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">zpool create <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -o ashift<span style="color:#f92672">=</span><span style="color:#ae81ff">12</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O mountpoint<span style="color:#f92672">=</span>none <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O compression<span style="color:#f92672">=</span>lz4 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O acltype<span style="color:#f92672">=</span>posixacl <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O xattr<span style="color:#f92672">=</span>sa <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O atime<span style="color:#f92672">=</span>on <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O relatime<span style="color:#f92672">=</span>on <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O encryption<span style="color:#f92672">=</span>aes-256-gcm <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    -O keyformat<span style="color:#f92672">=</span>passphrase <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    morningstar /dev/vda2
+
+zfs create -o mountpoint<span style="color:#f92672">=</span>legacy morningstar/root
+zfs create -o mountpoint<span style="color:#f92672">=</span>legacy morningstar/home
+</code></pre></div>
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>
