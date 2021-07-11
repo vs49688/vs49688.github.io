@@ -258,7 +258,32 @@ This is either a bitfield, or a struct. I&rsquo;m going with a struct:</li>
 
     <span style="color:#66d9ef">return</span> c<span style="color:#f92672">-&gt;</span>predictor;
 }
-</code></pre></div>
+</code></pre></div><p>There&rsquo;s actually a minor bug in this that I missed. Notice the <code>abs(nibble)</code> being used to index
+the index table. This is in the range <code>0 ≤ abs(nibble) ≤ 8</code>, but there&rsquo;s only 8 elements in the
+index table, leading to a potential buffer overrun. This was caught by FFmpeg&rsquo;s automated fuzzing<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>.</p>
+<p>As explained <a href="https://ffmpeg.org/pipermail/ffmpeg-devel/2020-May/263503.html">here</a>:</p>
+<blockquote>
+<p>ff_adpcm_ima_cunning_index_table[abs(nibble)] is wrong in the case
+where nibble == -8.</p>
+<p>If you take the unsigned nibble, and apply f():</p>
+<pre><code>  f(x) = 16 - x if x &gt; 8 else x &amp; 0x7
+</code></pre>
+<p>you&rsquo;ll get the same value as abs() applied with the signed nibble,
+except for this one case (abs(-8) == 8, f(8) == 0).</p>
+</blockquote>
+<p>The fix was to simply extend the index table with an extra <code>-1</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#66d9ef">const</span> int8_t ff_adpcm_ima_cunning_index_table[<span style="color:#ae81ff">9</span>] <span style="color:#f92672">=</span> {
+    <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">4</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+};
+</code></pre></div><section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p><a href="https://ffmpeg.org/pipermail/ffmpeg-devel/2020-May/263432.html">https://ffmpeg.org/pipermail/ffmpeg-devel/2020-May/263432.html</a>&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+
 </div>
 
         </div><div id="footer" class="mb-5">
