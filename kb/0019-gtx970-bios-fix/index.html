@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0019-gtx970-bios-fix/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Unbricking a Gigabyte GV-N970G1 GAMING-4GD</title>
+    <meta name="description" content="">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="gtx970, gtx, nvidia, bios">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> Unbricking a Gigabyte GV-N970G1 GAMING-4GD</h1>
+        <hr>
+        
+        <i>2020-07-10</i>
+        
+        <hr>
+    </header>
+
+    <p>This card has dual-BIOSes, meaning if one is borked (in my case, via an
+accidental incorrect flash), it can be fixed.</p>
+<p>VBIOS' are switched by changing the physical output. With only ONE monitor plugged in,
+try to boot off both the HDMI and DVI ports. Whichever one works is the good BIOS.
+Once booted, plug the monitor into the other and reflash.</p>
+<p>Basically, to fix is to boot the computer using the good VBIOS, then flash the bad.</p>
+<p>This was done on Ubuntu MATE 20.04.</p>
+<h1 id="steps">Steps</h1>
+<ol>
+<li>
+<p>Boot using the good BIOS.</p>
+<p>Plug ONE monitor into the various ports and attempt boot. When one boots, the card is
+using the good BIOS.</p>
+</li>
+<li>
+<p>Download <a href="https://www.techpowerup.com/download/nvidia-nvflash/">nvflash</a> and
+<a href="https://www.techpowerup.com/vgabios/177255/Gigabyte.GTX970.4096.150104.rom">Gigabyte.GTX970.4096.150104.rom</a>
+(<a href="./Gigabyte.GTX970.4096.150104.rom">mirror</a>) (or the current &ldquo;good&rdquo; version on your card).</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>SHA1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nvflash_5.414.0_linux.zip</td>
+<td>68b5989f36615b5df5293046b2ad2f01702003c4</td>
+</tr>
+<tr>
+<td>Gigabyte.GTX970.4096.150104.rom</td>
+<td>9a79ed1ca8ac7290edb209083e3f7374282fbdc4</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>Stop the display manager and unload the nvidia modules.</p>
+<p>This should be done via SSH from another machine, as the card will be switched
+to the bad bios soon.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># systemctl stop lightdm
+
+# rmmod nvidia_uvm nvidia_drm nvidia_modeset nvidia
+</code></pre></div><p>If this fails for some reason, blacklist the modules in <code>/etc/modprobe.d/</code> and reboot.</p>
+</li>
+<li>
+<p>Make sure nvflash can see the card.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># ./nvflash_linux --list
+
+NVIDIA Firmware Update Utility (Version 5.414.0)
+Simplified Version For OEM Only
+NVIDIA display adapters present in system:
+&lt;0&gt; GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</code></pre></div></li>
+<li>
+<p>Compare the good bios against the downloaded one. If it mismatches,
+download the correct one and repeat. Even if you want to upgrade to a new version,
+DON&rsquo;T. Restore the bad one first, then upgrade both of them.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># ./nvflash_linux --verify Gigabyte.GTX970.4096.150104.rom 
+
+NVIDIA Firmware Update Utility (Version 5.414.0)
+Simplified Version For OEM Only
+Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+
+Identifying EEPROM...
+EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+Reading adapter firmware image...
+Current      - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+               GM204 Board (Normal Board)
+Compare with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+               GM204 Board (Normal Board)
+File firmware image matches adapter firmware image.
+</code></pre></div></li>
+<li>
+<p>Switch to the bad bios by plugging the ONE monitor into a non-working port
+and verify the bios mismatches.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># ./nvflash_linux --verify Gigabyte.GTX970.4096.150104.rom 
+
+NVIDIA Firmware Update Utility (Version 5.414.0)
+Simplified Version For OEM Only
+Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+
+Identifying EEPROM...
+EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+Reading adapter firmware image...
+Current      - Version:84.04.28.00.4C ID:10DE:13C2:1458:367B
+               GM204 Board (Normal Board)
+Compare with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+               GM204 Board (Normal Board)
+
+ERROR: Mismatch at offset 0x00000004.
+
+      Size diffs between file(179712) and adapter firmware (180224)
+
+</code></pre></div></li>
+<li>
+<p>Flash the card.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># ./nvflash_linux Gigabyte.GTX970.4096.150104.rom 
+
+NVIDIA Firmware Update Utility (Version 5.414.0)
+Simplified Version For OEM Only
+Checking for matches between display adapter(s) and image(s)...
+
+Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+
+Current      - Version:84.04.28.00.4C ID:10DE:13C2:1458:367B
+               GM204 Board (Normal Board)
+Replace with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+               GM204 Board (Normal Board)
+
+Update display adapter firmware?
+Press &#39;y&#39; to confirm (any other key to abort):  y
+Identifying EEPROM...
+EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+Storing updated firmware image...
+.....................
+Verifying update...
+Update successful.
+
+Firmware image has been updated from version 84.04.28.00.4C to 84.04.36.00.2F.
+
+
+A reboot is required for the update to take effect.
+</code></pre></div><p>Reboot, and the card should be fixed.</p>
+</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<p>To dump the nvflash version and EEPROM info:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text"># ./nvflash_linux --version
+
+NVIDIA Firmware Update Utility (Version 5.414.0)
+Simplified Version For OEM Only
+Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+
+Identifying EEPROM...
+EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+Reading adapter firmware image...
+IFR Data Size         : 1768 bytes
+IFR CRC32             : C140E136
+IFR Image Size        : 2048 bytes
+IFR Image CRC32       : 6E5E9720
+IFR Subsystem ID      : 1458-367A
+Image Size            : 177664 bytes
+Version               : 84.04.36.00.2F
+~CRC32                : 41D1A30D
+Image Hash            : EFC70375821CF8250469C60322951166
+OEM String            : NVIDIA
+Vendor Name           : NVIDIA Corporation
+Product Name          : GM204 Board
+Product Revision      : Chip Rev   
+Device Name(s)        : GeForce GTX 970
+Board ID              : E908
+PCI ID                : 10DE-13C2
+Subsystem ID          : 1458-367A
+Hierarchy ID          : Normal Board
+Chip SKU              : 200-0
+Project               : G401-0010
+CDP                   : N/A
+Build Date            : 11/12/14
+Modification Date     : 01/04/15
+UEFI Support          : Yes
+UEFI Version          : 0x20007 (Sep 18 2014 @ 18895672 )
+UEFI Variant Id       : 0x0000000000000006 ( GM2xx )
+UEFI Signer(s)        : Microsoft Corporation UEFI CA 2011
+InfoROM Version       : N/A
+InfoROM Backup Exist  : NO
+License Placeholder   : Absent
+GPU Mode              : N/A
+Sign-On Message       : GV-N970G1 GAMING-4GD_P/F60
+</code></pre></div>
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>
