@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0009-bfme-launchers/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Battle for Middle Earth Launcher Notes</title>
+    <meta name="description" content="Battle for Middle Earth Launcher Notes">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="re, reverse engineering, lotr, lotrbfme">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> Battle for Middle Earth Launcher Notes</h1>
+        <hr>
+        
+        <i>2018-04-07</i>
+        
+        <hr>
+    </header>
+
+    <p><a href="https://github.com/vs49688/lotrbfme-launchers">https://github.com/vs49688/lotrbfme-launchers</a></p>
+<h2 id="the-battle-for-middle-earth">The Battle for Middle-earth</h2>
+<p>When the launcher starts, it creates three objects:</p>
+<ul>
+<li><code>46EB79F1-5924-4375-AE1E-1C3C36C7AC4D</code>, using <code>CreateMutexA()</code>.
+<ul>
+<li>This is required to exist by the game executable. Without it, it exits immediately.</li>
+</ul>
+</li>
+<li><code>4B4833CF-86AE-4bef-BB28-08170D3581DB</code>, using <code>CreateMutexW()</code>.
+<ul>
+<li>This appears to not be used. It is omitted in this launcher.</li>
+</ul>
+</li>
+<li><code>CA5F8EE2-0630-4ef3-BD73-D71F832CD25F</code>, using <code>CreateEventA()</code>.
+<ul>
+<li>Used to signal the game executable that the payload is ready.</li>
+</ul>
+</li>
+</ul>
+<p>Next, the game executable is launched, which waits for the event above to be triggered.</p>
+<p>The registry is checked for the game&rsquo;s &ldquo;electronic registration code&rdquo; (ergc), located in:</p>
+<ul>
+<li><code>HKLM\SOFTWARE\Electronic Arts\EA Games\The Battle for Middle-earth\ergc</code>, or</li>
+<li><code>HKCU\SOFTWARE\Electronic Arts\EA Games\The Battle for Middle-earth\ergc</code>
+If one doesn&rsquo;t exist, it checks the other. If none exists, it uses an empty string.</li>
+</ul>
+<p>The registry is checked for the game&rsquo;s install directory, located in:</p>
+<ul>
+<li><code>HKLM\SOFTWARE\Electronic Arts\EA Games\The Battle for Middle-earth</code>, <code>InstallPath</code>, or</li>
+<li><code>HKCU\SOFTWARE\Electronic Arts\EA Games\The Battle for Middle-earth</code>, <code>InstallPath</code>
+This is used to obtain the volume serial number of the drive it&rsquo;s installed on.</li>
+</ul>
+<p>The registry is checked for the system&rsquo;s product id, located in:</p>
+<ul>
+<li><code>HKLM\Software\Microsoft\Windows\CurrentVersion</code>, <code>ProductID</code>
+This key doesn&rsquo;t appear to exist on later versons of windows, so it just uses an empty string.</li>
+</ul>
+<p>These three properties are combined into what I call an &ldquo;infostring&rdquo;, which is of the format:
+<code>%lx-%s-%s</code>, <code>serial_number</code>, <code>ergc</code>, <code>product_id</code>.</p>
+<p>Using the infostring, it makes a copy of the game keys and does some processing on them.</p>
+<p>These modified keys are then used to decrypt the contents of <code>LOTRBFMe.dat</code>, a 36-byte file in
+the game directory that is created by the installer. If decryption is successful, the result should
+be <code>B966C0E5-16AC-4ebd-90AC-D7A8C8976040</code>. The launcher doesn&rsquo;t check if this is correct, which is
+the main part of the &ldquo;copy-protection&rdquo;.</p>
+<p>The launcher then creates a 36-byte memory-mapped file and writes the decrypted payload into it.
+A message is posted to the game executable&rsquo;s main thread, with the message id as <code>0xBEEF</code>, wParam as 0,
+and lParam the handle to this memory-mapped file.
+The event is then signalled, and the game starts up.</p>
+<p>The launcher waits for the game to exit.</p>
+<p>If the payload is incorrect, any match will automatically end after three minutes as punishment
+for not buying the game.</p>
+<h2 id="the-battle-for-middle-earth-ii">The Battle for Middle-earth II</h2>
+<p>The second game uses an identical method, except it loads the mutex names, event names, and
+payloads from a file called <code>gi.dat</code> in the game directory.</p>
+<p>The equivalent of <code>LOTRBFMe.dat</code> is <code>game2.dat</code>.</p>
+<p><code>gi.dat</code> is a blob of NULL-terminated strings with a header. Each pair of strings is a key/value pair.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00f">struct</span> gi_dat
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    uint8 magic[4] = {0x47, 0x49, 0x20, 0x20} <span style="color:#008000">// &#34;GI  &#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#008000"></span>    uint32_le count;	<span style="color:#008000">// The number of key-value pairs in the file.
+</span></span></span><span style="display:flex;"><span><span style="color:#008000"></span>    <span style="color:#00f">struct</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        asciiz key;
+</span></span><span style="display:flex;"><span>        asciiz value;
+</span></span><span style="display:flex;"><span>    } content[count];
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Known keys are:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SkuName</code></td>
+<td><code>lotrbfme2</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>GameName</code></td>
+<td><code>The Battle for Middle-earth II</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>GameRegPath</code></td>
+<td><code>SOFTWARE\Electronic Arts\Electronic Arts\The Battle for Middle-earth II</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>InstallerRegPath</code></td>
+<td><code>SOFTWARE\Electronic Arts\The Battle for Middle-earth II</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>OnlineServer</code></td>
+<td><code>http://servserv.generals.ea.com/servserv/lotrbfme2</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>UserDataLeafName</code></td>
+<td><code>My Battle for Middle-earth(tm) II Files</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>G1</code></td>
+<td><code>4CE5E3EE-B113-4417-B651-6575C092F128</code></td>
+<td><code>CreateMutexA()</code> mutex name.</td>
+</tr>
+<tr>
+<td><code>G2</code></td>
+<td><code>37915039-6803-49e7-B69E-64FD313B7E8B</code></td>
+<td><code>CreateMutexW()</code> mutex name.</td>
+</tr>
+<tr>
+<td><code>G3</code></td>
+<td><code>D0BE288D-395A-4a73-A50E-A796A9E1D804</code></td>
+<td>The event name.</td>
+</tr>
+<tr>
+<td><code>G4</code></td>
+<td><code>D9151691-DF43-448c-87C2-742C1FC0FAEB</code></td>
+<td>The expected payload.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-battle-for-middle-earth-ii-rise-of-the-witch-king">The Battle for Middle-earth II: Rise of the Witch King</h2>
+<p>Exactly the same as the base game except with slightly different <code>gi.dat</code> values.
+The <code>G1-G4</code> values are the same.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SkuName</code></td>
+<td><code>lotrbfme2ep1</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>GameName</code></td>
+<td><code>The Lord of the Rings, The Rise of the Witch-king</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>GameRegPath</code></td>
+<td><code>SOFTWARE\Electronic Arts\Electronic Arts\The Lord of the Rings, The Rise of the Witch-king</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>InstallerRegPath</code></td>
+<td><code>SOFTWARE\Electronic Arts\The Lord of the Rings, The Rise of the Witch-king</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>OnlineServer</code></td>
+<td><code>http://servserv.generals.ea.com/servserv/lotrbfme2ep1</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>UserDataLeafName</code></td>
+<td><code>My The Lord of the Rings, The Rise of the Witch-king Files</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>G1</code></td>
+<td><code>4CE5E3EE-B113-4417-B651-6575C092F128</code></td>
+<td><code>CreateMutexA()</code> mutex name.</td>
+</tr>
+<tr>
+<td><code>G2</code></td>
+<td><code>37915039-6803-49e7-B69E-64FD313B7E8B</code></td>
+<td><code>CreateMutexW()</code> mutex name.</td>
+</tr>
+<tr>
+<td><code>G3</code></td>
+<td><code>D0BE288D-395A-4a73-A50E-A796A9E1D804</code></td>
+<td>The event name.</td>
+</tr>
+<tr>
+<td><code>G4</code></td>
+<td><code>D9151691-DF43-448c-87C2-742C1FC0FAEB</code></td>
+<td>The expected payload.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="other-notes">Other notes</h2>
+<h3 id="rotwk-manual-installation">[RotWK] Manual Installation</h3>
+<p>Just extract <code>0compressed.zip</code> and <code>0en-uk_compressed.zip</code> to the same folder.
+The file names have embedded &lsquo;\&rsquo; in them, but the standard <code>unzip</code> on Linux utility seems to handle this fine.</p>
+<p>Also copy <code>gi.dat</code> to the same folder.</p>
+<h3 id="rotwk-setup">[RotWK] Setup</h3>
+<p>RotWK needs BFME2 installed to run. It uses <code>HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\lotrbfme2.exe</code>
+to determine the game path and looks for the following files:</p>
+<ul>
+<li>eauninstall.exe</li>
+<li>game.dat</li>
+<li>lotrbfme2.exe</li>
+<li>lotrbfme2.lcf</li>
+</ul>
+<p>If any don&rsquo;t exist, it refuses to launch. Their contents isn&rsquo;t checked, only that they exist.
+If all files are present, the game loads uses BFME2&rsquo;s <code>filelist.txt</code> to load shared assets
+before starting up.</p>
+<pre tabindex="0"><code>Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\lotrbfme2.exe]
+@=&#34;Z:\\Games\\The Battle for Middle-earth (tm) II\\lotrbfme2.exe&#34;
+&#34;Path&#34;=&#34;Z:\\Games\\The Battle for Middle-earth (tm) II&#34;
+</code></pre><h3 id="bfme2-rotwk-launcher-hangs-and-crashes">[BFME2] [RotWK] Launcher hangs and crashes</h3>
+<p>This isn&rsquo;t actually the launcher, it&rsquo;s the game.
+Create and place the following in the following:</p>
+<ul>
+<li><code>%APPDATA%\My Battle for Middle-earth(tm) II Files\Options.ini</code></li>
+<li><code>%APPDATA%\My The Lord of the Rings, The Rise of the Witch-king Files\Options.ini</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span>AllHealthBars = <span style="color:#a31515">yes</span>
+</span></span><span style="display:flex;"><span>MusicVolume = <span style="color:#a31515">60.000000</span>
+</span></span><span style="display:flex;"><span>AmbientVolume = <span style="color:#a31515">70.000000</span>
+</span></span><span style="display:flex;"><span>SFXVolume = <span style="color:#a31515">100.000000</span>
+</span></span><span style="display:flex;"><span>VoiceVolume = <span style="color:#a31515">80.000000</span>
+</span></span><span style="display:flex;"><span>MovieVolume = <span style="color:#a31515">80.000000</span>
+</span></span><span style="display:flex;"><span>AudioLOD = <span style="color:#a31515">High</span>
+</span></span><span style="display:flex;"><span>UseEAX3 = <span style="color:#a31515">no</span>
+</span></span><span style="display:flex;"><span>Brightness = <span style="color:#a31515">50</span>
+</span></span><span style="display:flex;"><span>HasGotOnline = <span style="color:#a31515">yes</span>
+</span></span><span style="display:flex;"><span>IdealStaticGameLOD = <span style="color:#a31515">UltraHigh</span>
+</span></span><span style="display:flex;"><span>StaticGameLOD = <span style="color:#a31515">UltraHigh</span>
+</span></span><span style="display:flex;"><span>Resolution = <span style="color:#a31515">1920 1080</span>
+</span></span><span style="display:flex;"><span>ScrollFactor = <span style="color:#a31515">50</span>
+</span></span><span style="display:flex;"><span>FlashTutorial = <span style="color:#a31515">0</span>
+</span></span><span style="display:flex;"><span>HasSeenLogoMovies = <span style="color:#a31515">yes</span>
+</span></span><span style="display:flex;"><span>TimesInGame = <span style="color:#a31515">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

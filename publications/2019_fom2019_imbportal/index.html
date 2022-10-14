@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/publications/2019_fom2019_imbportal/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Graphical User Web Based Interface for Batch Processing of Images on a Linux based GPU High Performance Cluster</title>
+    <meta name="description" content="">
+    <meta name="author" content="Zane van Iperen">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+
+<div class="container" id="publications">
+	<header>
+		<h1>Graphical User Web Based Interface for Batch Processing of Images on a Linux based GPU High Performance Cluster</h1>	
+		<ul class="authors comma-separated-list">
+			<li>Hoang Anh Nguyen<sup>1</sup></li>
+		
+			<li>Zane van Iperen<sup>1</sup></li>
+		
+			<li>Jake Carroll<sup>1</sup></li>
+		
+			<li>David Abramson<sup>1</sup></li>
+		
+			<li>Nicholas Condon<sup>2</sup></li>
+		
+			<li>Mark Scott<sup>2</sup></li>
+		
+			<li>James Springfield<sup>2</sup></li>
+		</ul>
+
+		<ol class="institutions">
+			<li><sup>1</sup>Research Computing Centre, The University of Queensland, Australia</li>
+		
+			<li><sup>2</sup>Institute for Molecular Bioscience, The University of Queensland, Australia</li>
+		</ol>
+
+		<p>2019</p>
+
+		<p>Focus on Microscopy 2019</p>
+
+		
+	</header>
+
+	<h2>Abstract</h2>
+	
+	<div id="abstract">
+	
+		<p>The latest generation of sCMOS camera based microscopes such as the lattice lightsheet and
+Andor Dragonfly spinning disc confocal have placed growing demands on researchers to
+process, analyse and store huge datasets an order of magnitude greater than what was
+considered normal only a few years ago. Unfortunately the hardware and software systems
+which have been built to handle such large data (namely Linux based High performance
+computing, HPC), are typically managed by IT specialists, and are not considered layman
+friendly. Our goal, was to produce an intuitive Image Processing Portal that our core facility
+users, with no HPC experience could use with minimal support or training. We present a web
+portal that is capable of performing large scale, batch processing of microscopy images within
+a GPU based HPC. This portal provides intuitive web pages allowing users to login remotely
+from anywhere in the world to submit image processing jobs.</p>
+<p>Utilising the portal to submit jobs, image deconvolution is
+performed using the Microvolution deconvolution engine[1]
+on our Wiener GPU cluster[2] via multiple Dell r740
+nodes each containing two NVIDIA V100 GPUs.</p>
+<p>Other utilities being developed for the Image Processing
+Portal include: A file format conversion page, which allows
+users to easily batch convert their datasets between image
+formats. This was originally developed to deal with large
+Andor Dragonfly “.ims” files which could not be opened in
+ImageJ/FIJI.</p>
+<p>Another feature being developed, which will utilise the
+MeDiCI (Metropolitan Data Caching Infrastructure)
+provided by the Research Computing Centre[3], is a GUI
+interface which will simplify the process of data transfer
+between the acquisition PC to the HPC via a high-speed
+Linux-based GPFS parallel file system.</p>
+<p>The portal can be modified to add additional tools and run on other hardware configurations.</p>
+<p>The portal is currently available to UQ users at: <a href="https://imbmicroscopy.rcc.uq.edu.au">https://imbmicroscopy.rcc.uq.edu.au</a>.</p>
+<p>The source code is available via Github at <a href="https://github.com/UQ-RCC/IMBPortal">https://github.com/UQ-RCC/IMBPortal</a></p>
+
+	
+	</div>
+	<h2>Downloads</h2>
+	<p><a href="/publications/2019_fom2019_imbportal/2019_fom2019_imbportal.pdf">Abstract</a></p>	
+	
+	
+	<h2>References</h2>
+	<ol class="references">
+	
+		<li><a href="http://microvolution.com/">http://microvolution.com/</a></li>
+	
+		<li><a href="https://rcc.uq.edu.au/wiener">https://rcc.uq.edu.au/wiener</a></li>
+	
+		<li><a href="https://rcc.uq.edu.au/data-storage">https://rcc.uq.edu.au/data-storage</a></li>
+	
+	</ol>
+	
+	
+	
+</div>
+
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0008-trl-nosteam/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Tomb Raider: Legend SteamStub research</title>
+    <meta name="description" content="Tomb Raider: Legend SteamStub research">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="re, reverse engineering, trl, tomb raider, tomb raider legend, steam, steamstub">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> Tomb Raider: Legend SteamStub research</h1>
+        <hr>
+        
+        <i>2019-05-11</i>
+        
+        <hr>
+    </header>
+
+    <p><strong>tl;dr</strong>: Set entrypoint to <code>0x00AE7488</code>, remove the <code>.bind</code> section and rebuild the
+executable.</p>
+<hr>
+<p>The executable is protected by an older version of SteamStub:</p>
+<ul>
+<li>It has a <code>.bind</code> section,</li>
+<li>When run, fails with a <code>Failed to find Steam</code> message box.</li>
+<li>Doesn&rsquo;t have the known <code>0xCODECODE</code> signature for later variants.</li>
+<li>The stub doesn&rsquo;t actually do anything other than some simple checks,
+it can be removed entirely.</li>
+</ul>
+<h2 id="removing-steamstub">Removing SteamStub</h2>
+<p>There&rsquo;s an unconditional <code>jmp</code> to <code>0x00EE7488</code> towards the end of the <code>.bind</code> section.
+Convert <code>0x00EE7488</code> to an offset, and you&rsquo;ll get <code>0x00AE7488</code>, which is the OEP.</p>
+<pre tabindex="0"><code>.bind:015755DD loc_15755DD:
+.bind:015755DD                 popa
+.bind:015755DE                 mov     eax, offset sub_EE7488
+.bind:015755E3                 jmp     eax
+.bind:015755E3 start           endp
+.bind:015755E3
+.bind:015755E3 ; 
+</code></pre><p>Using CFF Explorer, set the entry point in the header to this and remove the <code>.bind</code> section.</p>
+<h2 id="steamstub-configuration">SteamStub configuration</h2>
+<p>This is an &ldquo;encrypted&rdquo; 428-byte blob located at <code>0x0015755E8</code>. It looks like:</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#00f">typedef</span> <span style="color:#00f">struct</span> <span style="color:#2b91af">SteamStubConfig</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#00f">using</span> GETMODULEHANDLEA = HMODULE(WINAPI*)(LPCSTR);
+</span></span><span style="display:flex;"><span>    <span style="color:#00f">using</span> GETPROCADDRESS   = FARPROC(WINAPI*)(HMODULE, LPCSTR);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    GETMODULEHANDLEA   _GetModuleHandleA; <span style="color:#008000">// 32-bit
+</span></span></span><span style="display:flex;"><span><span style="color:#008000"></span>    GETPROCADDRESS     _GetProcAddress;   <span style="color:#008000">// 32-bit
+</span></span></span><span style="display:flex;"><span><span style="color:#008000"></span>    <span style="color:#2b91af">uint32_t</span>           bind_start;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span>           bind_size;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span>           bind_checksum;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span>           appid;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_appid[8];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_kernel32[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_user32[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_shell32[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_loadlibraryexa[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_freelibrary[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_messageboxa[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_getmodulefilenamea[24];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_lstrlena[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_lstrcata[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_exitprocess[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_shellexecutea[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamerror[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamdll[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamappissubscribed[24];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamstartup[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamcleanup[16];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_failedtofind[32];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_failedtoload[32];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamstore[24];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_steamrun[24];
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span>               sz_open[8];
+</span></span><span style="display:flex;"><span>} SteamStubConfig;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>The decryption algorithm located right at the start of the <code>.bind</code> section. Decompiled, it is as follows:</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#2b91af">void</span> decrypt_config(<span style="color:#2b91af">void</span> *_buf, size_t size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint8_t</span> *buf = _buf;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#00f">for</span>(size_t i = 0; i &lt; size; ++i)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#2b91af">int32_t</span> key = (i * i) &amp; 0x800000FF;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#008000">/* NB: This branch is never taken. */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#00f">if</span>(key &lt; 0)
+</span></span><span style="display:flex;"><span>            key = ((key - 1) | 0x0FFFFFF00) + 1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        buf[i] = (buf[i] ^ key);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Once decrypted, it looks like:</p>
+<p><a href="sscfg2.png"><img src="sscfg2.png" alt="Debug View of the decrypted SteamStub configuration"></a></p>
+
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

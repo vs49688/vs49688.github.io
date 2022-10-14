@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0017-croc2notes/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Croc 2 Notes</title>
+    <meta name="description" content="">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="croc, croc2, re, reverse engineering">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> Croc 2 Notes</h1>
+        <hr>
+        
+        <i>2021-02-22</i>
+        
+        <hr>
+    </header>
+
+    <h2 id="binary-hash">Binary Hash</h2>
+<pre tabindex="0"><code>$ sha1sum Croc2.exe
+c7e9ed848e311706dde83116fd122a0b28b99261  Croc2.exe
+</code></pre><h2 id="embedded-music-table">Embedded Music Table</h2>
+<h3 id="croc2exemusictablebt">croc2exemusictable.bt</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>LittleEndian();
+</span></span><span style="display:flex;"><span>FSeek(0xA46FC);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00f">typedef</span> <span style="color:#00f">struct</span> {
+</span></span><span style="display:flex;"><span>    uint32 flags;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">char</span> filename[12];
+</span></span><span style="display:flex;"><span>    uint32 unk;
+</span></span><span style="display:flex;"><span>    uint32 nameptr &lt;format=hex&gt;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    local uint32 pos = FTell();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    FSeek(nameptr - 0x400000);
+</span></span><span style="display:flex;"><span>    string name;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    FSeek(pos);
+</span></span><span style="display:flex;"><span>    uint32 unk2&lt;format=hex&gt;;
+</span></span><span style="display:flex;"><span>} musicdef&lt;read=xxread&gt;;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>string xxread(musicdef&amp; d)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    string s;
+</span></span><span style="display:flex;"><span>    SPrintf(s, <span style="color:#a31515">&#34;[%s] - [%s]&#34;</span>, d.filename, d.name);
+</span></span><span style="display:flex;"><span>    <span style="color:#00f">return</span> s;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>musicdef music[47]&lt;optimize=false&gt;;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th>Struct</th>
+<th>File</th>
+<th>Title</th>
+<th>Offset</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>struct musicdef music[0]</td>
+<td></td>
+<td>No Track</td>
+<td>A46FCh</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[1]</td>
+<td>JHUB1</td>
+<td>Hub Tribe 1</td>
+<td>A4718h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[2]</td>
+<td>KWATERFALL</td>
+<td>Waterfall</td>
+<td>A4734h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[3]</td>
+<td>CBK2</td>
+<td>Cannon Boat Keith</td>
+<td>A4750h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[4]</td>
+<td>KBARREN3</td>
+<td>Barren Three</td>
+<td>A476Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[5]</td>
+<td>JMINE2</td>
+<td>The Mine</td>
+<td>A4788h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[6]</td>
+<td>KCAVE1</td>
+<td>Cave One</td>
+<td>A47A4h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[7]</td>
+<td>JICECAVE</td>
+<td>Ice Cave</td>
+<td>A47C0h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[8]</td>
+<td>KJUNGLE3</td>
+<td>Jungle Two</td>
+<td>A47DCh</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[9]</td>
+<td>JBARREN1</td>
+<td>Barren Wheels One</td>
+<td>A47F8h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[10]</td>
+<td>KDANTE1</td>
+<td>Dante One</td>
+<td>A4814h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[11]</td>
+<td>KCMCAVE</td>
+<td>Caveman Cave One</td>
+<td>A4830h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[12]</td>
+<td>KSOVEENA</td>
+<td>Soveena</td>
+<td>A484Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[13]</td>
+<td>KBARREN1</td>
+<td>Barren Wheels Two</td>
+<td>A4868h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[14]</td>
+<td>KGLIDE</td>
+<td>Glider</td>
+<td>A4884h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[15]</td>
+<td>KLLLARRY</td>
+<td>Lava Lamp Larry</td>
+<td>A48A0h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[16]</td>
+<td>JBARREN2</td>
+<td>Forest Barren</td>
+<td>A48BCh</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[17]</td>
+<td>JICE2</td>
+<td>Ice Land</td>
+<td>A48D8h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[18]</td>
+<td>JJUNGLE3</td>
+<td>Find The Key</td>
+<td>A48F4h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[19]</td>
+<td>KSNOWBALL</td>
+<td>Snowball</td>
+<td>A4910h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[20]</td>
+<td>JTHIEFJUNGLE</td>
+<td>Thief Jungle</td>
+<td>A492Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[21]</td>
+<td>JTHIEFCAVE</td>
+<td>Thief Cave</td>
+<td>A4948h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[22]</td>
+<td>JGOLDROCK</td>
+<td>Gold Rock Race</td>
+<td>A4964h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[23]</td>
+<td>JICECAVE</td>
+<td>Ice Cave One</td>
+<td>A4980h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[24]</td>
+<td>CHOOCAVE</td>
+<td>Choo Cave</td>
+<td>A499Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[25]</td>
+<td>CHOOOUT</td>
+<td>Choo Outside</td>
+<td>A49B8h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[26]</td>
+<td>KRIVERRACE</td>
+<td>River Race</td>
+<td>A49D4h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[27]</td>
+<td>KDANTE2</td>
+<td>Dante Two</td>
+<td>A49F0h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[28]</td>
+<td>GTOWER</td>
+<td>Goo Manchoo Tower</td>
+<td>A4A0Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[29]</td>
+<td>CBKLEAD</td>
+<td>CBK Lead Up</td>
+<td>A4A28h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[30]</td>
+<td>KFLAVIO</td>
+<td>Flavio</td>
+<td>A4A44h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[31]</td>
+<td>KDUNGEON</td>
+<td>Dungeon</td>
+<td>A4A60h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[32]</td>
+<td>JINCA1</td>
+<td>Inca Babies One</td>
+<td>A4A7Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[33]</td>
+<td>JHUB2</td>
+<td>Hub Tribe 4</td>
+<td>A4A98h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[34]</td>
+<td>JHUB1</td>
+<td>Hub Tribe 3</td>
+<td>A4AB4h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[35]</td>
+<td>KMASHER</td>
+<td>Masher</td>
+<td>A4AD0h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[36]</td>
+<td>JREDANT1</td>
+<td>Red Ant Lair</td>
+<td>A4AECh</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[37]</td>
+<td>JREDANT120</td>
+<td>Red Ant Bomb</td>
+<td>A4B08h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[38]</td>
+<td>KINCACAVE</td>
+<td>Inca Babies Two</td>
+<td>A4B24h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[39]</td>
+<td>JHUB2</td>
+<td>Hub Tribe 2</td>
+<td>A4B40h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[40]</td>
+<td>JVENUS</td>
+<td>Venus</td>
+<td>A4B5Ch</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[41]</td>
+<td>JVENUSLEAD</td>
+<td>Venus Lead Up</td>
+<td>A4B78h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[42]</td>
+<td>KMASHERLEAD</td>
+<td>Masher Lead Up</td>
+<td>A4B94h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[43]</td>
+<td>JTITLE</td>
+<td>Croc&rsquo;s Theme</td>
+<td>A4BB0h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[44]</td>
+<td>KCMCAVE2</td>
+<td>Caveman Cave Two</td>
+<td>A4BCCh</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[45]</td>
+<td>KSOVEENALEAD</td>
+<td>Soveena Lead Up</td>
+<td>A4BE8h</td>
+<td>28</td>
+</tr>
+<tr>
+<td>struct musicdef music[46]</td>
+<td>JREDANT25</td>
+<td>Red Ant Fast Lair</td>
+<td>A4C04h</td>
+<td>28</td>
+</tr>
+</tbody>
+</table>
+<h3 id="notes">Notes</h3>
+<ul>
+<li>There&rsquo;s a few duplicate entries for <code>JHUB1</code> and <code>JHUB2</code>.
+Presumably there was going to be different music for the Caveman and Inca tribes,
+but they ran out of time.</li>
+<li>Most files start with either J- or K-. I would assume these were short for the
+composers, i.e. <strong>J</strong>ustin Scharvona or <strong>K</strong>aren Griffin.</li>
+</ul>
+<h2 id="missing-track-restoration">Missing Track Restoration</h2>
+<p>The PSX version has an extra music track that&rsquo;s missing from the PC version.</p>
+<p>The plan was to change the track ID in the Caveman and Inca tribe maps to reference
+those of the Forest and Snow tribes which frees up two slots in the table.
+Then, replace one of the free slots with the missing track, update the respective
+map header, then encode the missing track to a format readable by the game.</p>
+<p>However, I encountered some difficulties during encoding. The Argonaut ADPCM codec
+can&rsquo;t accurately represent some parts of the waveform, manifesting as clicking and
+static noises during playback. This is probably the reason it was excluded originally.</p>
+<p>For comparison, see below:</p>
+<p><img src="audacity-compare.png" alt="Comparison picture of the Original and Encoded waveforms"></p>
+<p>For posterity, here&rsquo;s links to the files:</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original</td>
+<td><a href="PACK6.STR%5B1%5D.flac">PACK6.STR[1].flac</a></td>
+</tr>
+<tr>
+<td>Encoded</td>
+<td><a href="PACK6.STR%5B1%5D.ASF">PACK6.STR[1].ASF</a></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

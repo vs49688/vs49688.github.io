@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0019-gtx970-bios-fix/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Unbricking a Gigabyte GV-N970G1 GAMING-4GD</title>
+    <meta name="description" content="Guide to unbrick a Gigabute GV-N970G1 GAMING-4GD (GTX 970) from a bad BIOS flash.">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="gtx970, gtx, nvidia, bios">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> Unbricking a Gigabyte GV-N970G1 GAMING-4GD</h1>
+        <hr>
+        
+        <i>2020-07-10</i>
+        
+        <hr>
+    </header>
+
+    <p>This card has dual-BIOSes, meaning if one is borked (in my case, via an
+accidental incorrect flash), it can be fixed.</p>
+<p>VBIOS&rsquo; are switched by changing the physical output. With only ONE monitor plugged in,
+try to boot off both the HDMI and DVI ports. Whichever one works is the good BIOS.
+Once booted, plug the monitor into the other and reflash.</p>
+<p>Basically, to fix is to boot the computer using the good VBIOS, then flash the bad.</p>
+<p>This was done on Ubuntu MATE 20.04.</p>
+<h1 id="steps">Steps</h1>
+<ol>
+<li>
+<p>Boot using the good BIOS.</p>
+<p>Plug ONE monitor into the various ports and attempt boot. When one boots, the card is
+using the good BIOS.</p>
+</li>
+<li>
+<p>Download <a href="https://www.techpowerup.com/download/nvidia-nvflash/">nvflash</a> and
+<a href="https://www.techpowerup.com/vgabios/177255/Gigabyte.GTX970.4096.150104.rom">Gigabyte.GTX970.4096.150104.rom</a>
+(<a href="./Gigabyte.GTX970.4096.150104.rom">mirror</a>) (or the current &ldquo;good&rdquo; version on your card).</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>SHA1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>nvflash_5.414.0_linux.zip</td>
+<td>68b5989f36615b5df5293046b2ad2f01702003c4</td>
+</tr>
+<tr>
+<td>Gigabyte.GTX970.4096.150104.rom</td>
+<td>9a79ed1ca8ac7290edb209083e3f7374282fbdc4</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>Stop the display manager and unload the nvidia modules.</p>
+<p>This should be done via SSH from another machine, as the card will be switched
+to the bad bios soon.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># systemctl stop lightdm
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># rmmod nvidia_uvm nvidia_drm nvidia_modeset nvidia
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>If this fails for some reason, blacklist the modules in <code>/etc/modprobe.d/</code> and reboot.</p>
+</li>
+<li>
+<p>Make sure nvflash can see the card.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># ./nvflash_linux --list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NVIDIA Firmware Update Utility (Version 5.414.0)
+</span></span><span style="display:flex;"><span>Simplified Version For OEM Only
+</span></span><span style="display:flex;"><span>NVIDIA display adapters present in system:
+</span></span><span style="display:flex;"><span>&lt;0&gt; GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Compare the good bios against the downloaded one. If it mismatches,
+download the correct one and repeat. Even if you want to upgrade to a new version,
+DON&rsquo;T. Restore the bad one first, then upgrade both of them.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># ./nvflash_linux --verify Gigabyte.GTX970.4096.150104.rom 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NVIDIA Firmware Update Utility (Version 5.414.0)
+</span></span><span style="display:flex;"><span>Simplified Version For OEM Only
+</span></span><span style="display:flex;"><span>Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Identifying EEPROM...
+</span></span><span style="display:flex;"><span>EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+</span></span><span style="display:flex;"><span>Reading adapter firmware image...
+</span></span><span style="display:flex;"><span>Current      - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>Compare with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>File firmware image matches adapter firmware image.
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Switch to the bad bios by plugging the ONE monitor into a non-working port
+and verify the bios mismatches.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># ./nvflash_linux --verify Gigabyte.GTX970.4096.150104.rom 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NVIDIA Firmware Update Utility (Version 5.414.0)
+</span></span><span style="display:flex;"><span>Simplified Version For OEM Only
+</span></span><span style="display:flex;"><span>Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Identifying EEPROM...
+</span></span><span style="display:flex;"><span>EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+</span></span><span style="display:flex;"><span>Reading adapter firmware image...
+</span></span><span style="display:flex;"><span>Current      - Version:84.04.28.00.4C ID:10DE:13C2:1458:367B
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>Compare with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ERROR: Mismatch at offset 0x00000004.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>      Size diffs between file(179712) and adapter firmware (180224)
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>Flash the card.</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># ./nvflash_linux Gigabyte.GTX970.4096.150104.rom 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NVIDIA Firmware Update Utility (Version 5.414.0)
+</span></span><span style="display:flex;"><span>Simplified Version For OEM Only
+</span></span><span style="display:flex;"><span>Checking for matches between display adapter(s) and image(s)...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Current      - Version:84.04.28.00.4C ID:10DE:13C2:1458:367B
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>Replace with - Version:84.04.36.00.2F ID:10DE:13C2:1458:367A
+</span></span><span style="display:flex;"><span>               GM204 Board (Normal Board)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Update display adapter firmware?
+</span></span><span style="display:flex;"><span>Press &#39;y&#39; to confirm (any other key to abort):  y
+</span></span><span style="display:flex;"><span>Identifying EEPROM...
+</span></span><span style="display:flex;"><span>EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+</span></span><span style="display:flex;"><span>Storing updated firmware image...
+</span></span><span style="display:flex;"><span>.....................
+</span></span><span style="display:flex;"><span>Verifying update...
+</span></span><span style="display:flex;"><span>Update successful.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Firmware image has been updated from version 84.04.28.00.4C to 84.04.36.00.2F.
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>A reboot is required for the update to take effect.
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Reboot, and the card should be fixed.</p>
+</li>
+</ol>
+<h2 id="notes">Notes</h2>
+<p>To dump the nvflash version and EEPROM info:</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">41
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span># ./nvflash_linux --version
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>NVIDIA Firmware Update Utility (Version 5.414.0)
+</span></span><span style="display:flex;"><span>Simplified Version For OEM Only
+</span></span><span style="display:flex;"><span>Adapter: GeForce GTX 970      (10DE,13C2,1458,367A) H:--:NRM  S:00,B:03,D:00,F:00
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Identifying EEPROM...
+</span></span><span style="display:flex;"><span>EEPROM ID (C8,4012) : GD GD25Q20 2.7-3.6V 2048Kx1S, page
+</span></span><span style="display:flex;"><span>Reading adapter firmware image...
+</span></span><span style="display:flex;"><span>IFR Data Size         : 1768 bytes
+</span></span><span style="display:flex;"><span>IFR CRC32             : C140E136
+</span></span><span style="display:flex;"><span>IFR Image Size        : 2048 bytes
+</span></span><span style="display:flex;"><span>IFR Image CRC32       : 6E5E9720
+</span></span><span style="display:flex;"><span>IFR Subsystem ID      : 1458-367A
+</span></span><span style="display:flex;"><span>Image Size            : 177664 bytes
+</span></span><span style="display:flex;"><span>Version               : 84.04.36.00.2F
+</span></span><span style="display:flex;"><span>~CRC32                : 41D1A30D
+</span></span><span style="display:flex;"><span>Image Hash            : EFC70375821CF8250469C60322951166
+</span></span><span style="display:flex;"><span>OEM String            : NVIDIA
+</span></span><span style="display:flex;"><span>Vendor Name           : NVIDIA Corporation
+</span></span><span style="display:flex;"><span>Product Name          : GM204 Board
+</span></span><span style="display:flex;"><span>Product Revision      : Chip Rev   
+</span></span><span style="display:flex;"><span>Device Name(s)        : GeForce GTX 970
+</span></span><span style="display:flex;"><span>Board ID              : E908
+</span></span><span style="display:flex;"><span>PCI ID                : 10DE-13C2
+</span></span><span style="display:flex;"><span>Subsystem ID          : 1458-367A
+</span></span><span style="display:flex;"><span>Hierarchy ID          : Normal Board
+</span></span><span style="display:flex;"><span>Chip SKU              : 200-0
+</span></span><span style="display:flex;"><span>Project               : G401-0010
+</span></span><span style="display:flex;"><span>CDP                   : N/A
+</span></span><span style="display:flex;"><span>Build Date            : 11/12/14
+</span></span><span style="display:flex;"><span>Modification Date     : 01/04/15
+</span></span><span style="display:flex;"><span>UEFI Support          : Yes
+</span></span><span style="display:flex;"><span>UEFI Version          : 0x20007 (Sep 18 2014 @ 18895672 )
+</span></span><span style="display:flex;"><span>UEFI Variant Id       : 0x0000000000000006 ( GM2xx )
+</span></span><span style="display:flex;"><span>UEFI Signer(s)        : Microsoft Corporation UEFI CA 2011
+</span></span><span style="display:flex;"><span>InfoROM Version       : N/A
+</span></span><span style="display:flex;"><span>InfoROM Backup Exist  : NO
+</span></span><span style="display:flex;"><span>License Placeholder   : Absent
+</span></span><span style="display:flex;"><span>GPU Mode              : N/A
+</span></span><span style="display:flex;"><span>Sign-On Message       : GV-N970G1 GAMING-4GD_P/F60
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

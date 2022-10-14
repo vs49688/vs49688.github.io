@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/publications/2019_era2019_embedded-nimrod/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Embedded Nimrod: Straightforward HTC in HPC environments.</title>
+    <meta name="description" content="">
+    <meta name="author" content="Zane van Iperen">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+
+<div class="container" id="publications">
+	<header>
+		<h1>Embedded Nimrod: Straightforward HTC in HPC environments.</h1>	
+		<ul class="authors comma-separated-list">
+			<li>Zane van Iperen<sup>1</sup></li>
+		
+			<li>David Green<sup>1</sup></li>
+		
+			<li>Hoang Nguyen<sup>1</sup></li>
+		
+			<li>David Abramson<sup>1</sup></li>
+		</ul>
+
+		<ol class="institutions">
+			<li><sup>1</sup>Research Computing Centre, The University of Queensland, QLD, Australia</li>
+		</ol>
+
+		<p>2019</p>
+
+		<p>eResearch Australasia 2019</p>
+
+		
+	</header>
+
+	<h2>Abstract</h2>
+	
+	<div id="abstract">
+	
+		<p>HTC (High Throughput Computing) is a class of research computing workload that typically consists of
+of large quantities of small (CPU/memory) footprint, short-lived, independent jobs. The goal is to churn through
+them as quickly as possible. Many HTC workloads involve parameter sweeps whereby the same processing
+task is performed for a range of values of one, or more, input parameters. One example of this is
+gathering a statistical sample by running the same stochastic task and collecting multiple outcomes.</p>
+<p>HTC is generally regarded as different from HPC (High Performance Computing), due to its smaller footprint,
+independence of tasks, and shorter walltimes. However, it is not necessarily a clear distinction,
+because in some situations such as rapid design prototyping, a larger footprint HPC jobs could be
+employed repeatedly with short walltimes to rapidly optimize a design.</p>
+<p>Many of the common HPC workload managers, such as PBSPro, Torque, and SLURM, do not efficiently handle such
+jobs. For jobs with walltimes in the order of minutes and seconds, scheduling and setup overhead can often
+outpace the duration of the job itself. Job arrays are available to provide a more efficient way for handling
+very large numbers of independent tasks; however, there is still an overhead associated with the commencement
+and completion of each batch system job, or job array element.
+They are also fairly limited in their support for parameter sweeps.</p>
+<p>The independent nature of each job lends itself to the jobs becoming scattered across the HPC system.
+Traditional HPC workloads required much larger chunks of computing resources and small footprint, short walltime
+jobs can hold up the larger footprint workloads. From a resource management standpoint, it is more desirable to
+consolidate fragmented workloads such as job swarms into a subset of the HPC resources and to better manage the
+high turnover of tasks with a mechanism that has much more fine-grained control over the workload.</p>
+<p>Embedded Nimrod is a software tool created to address this problem.
+Instead of having to schedule the numerous HTC jobs through the existing batch system, only one is scheduled;
+Embedded Nimrod handles the scheduling and execution from within this pool of resources.</p>
+<p>Similar to its predecessor Nimrod/G[1], Embedded Nimrod is capable of elegantly handling parameter
+sweeps. Yet it requires minimal changes to existing job submission scripts.</p>
+<p>Embedded Nimrod has been used on the University of Queensland Research Computing Centre’s HPC clusters (including
+Tinaroo, Awoonga, and FlashLite) and on Barcelona Supercomputing Center’s NordIII.
+It has been used by several projects such as the Threatened Species Index, the first attempt to create an index
+for threatened species in Australia[2], and for inland drayage research at UQ, i.e. optimising the transportation
+of cargo containers inland from the Port of Brisbane[3].</p>
+
+	
+	</div>
+	<h2>Downloads</h2>
+	<p><a href="/publications/2019_era2019_embedded-nimrod/2019_era2019_embedded-nimrod.pdf">Abstract</a></p>	
+	<p><a href="/publications/2019_era2019_embedded-nimrod/2019_era2019_embedded-nimrod_slides.pdf">Slides</a></p>	
+	
+	
+	<h2>References</h2>
+	<ol class="references">
+	
+		<li>D. Abramson, J. Giddy, and L. Kotler, “High performance parametric modeling with Nimrod/G:
+Killer application for the global grid?” In <em>Proceedings 14th International Parallel and
+Distributed Processing Symposium. IPDPS 2000</em>, IEEE, 2000, pp. 520–528.</li>
+	
+		<li>NESP Threatened Species Recovery Hub. (2018). TSX – A threatened species index for
+Australia, Threatened Species Recovery Hub, [Online]. Available: <a href="https://tsx.org.au/">https://tsx.org.au/</a> (visited on 06/07/2019).</li>
+	
+		<li>Research Computing Centre, “Embedded Nimrod: The truck stops here,” Dec. 12, 2018.
+[Online]. Available: <a href="https://rcc.uq.edu.au/article/2018/12/embedded-nimrod-truck-stops-here">https://rcc.uq.edu.au/article/2018/12/embedded-nimrod-truck-stops-here</a> (visited on 06/07/2019).</li>
+	
+	</ol>
+	
+	
+	
+</div>
+
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

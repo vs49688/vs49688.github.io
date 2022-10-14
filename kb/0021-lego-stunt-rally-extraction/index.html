@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0021-lego-stunt-rally-extraction/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>LEGO Stunt Rally RFH/RFD extraction</title>
+    <meta name="description" content="">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="lego, stuntrally, stunt rally, lego stunt rally, re, reverse engineering">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> LEGO Stunt Rally RFH/RFD extraction</h1>
+        <hr>
+        
+        <i>2022-01-22</i>
+        
+        <hr>
+    </header>
+
+    <p>The game stores its files in a series of RFH/RFD files. RFHs contain the archive index;
+RFDs contain the raw data.</p>
+<p>Some files are actually a 4-byte header followed by a raw <a href="https://en.wikipedia.org/wiki/DEFLATE">DEFLATE</a>
+stream. This should be decompressed upon extraction.</p>
+<p>Extraction code can be found <a href="https://raw.githubusercontent.com/vs49688/scripts/master/stuntxtract.py">here</a> (<a href="./stuntxtract.py">mirror</a>).</p>
+<h2 id="rfh">RFH</h2>
+<p>This is simply a series of consecutive structs, each containing 20 bytes and a
+NULL-terminated C string.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Offset</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>uint32_t</td>
+<td>unk1</td>
+<td>0</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>unk2</td>
+<td>4</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>unk3</td>
+<td>8</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>size</td>
+<td>12</td>
+<td>Size of the file in bytes.</td>
+</tr>
+<tr>
+<td>uint32_t</td>
+<td>offset</td>
+<td>16</td>
+<td>Offset to the start of the file in the corresponding RFD.</td>
+</tr>
+<tr>
+<td>char[]</td>
+<td>path</td>
+<td>20</td>
+<td>Full path and name of the file, using <code>\</code> path separators.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="stuntrally_indexbt">stuntrally_index.bt</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#00f">typedef</span> uint32 <span style="color:#2b91af">uint32_t</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00f">typedef</span> <span style="color:#00f">struct</span> SRIndexEntry {
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span> unk1;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span> unk2;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span> unk3;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span> size;
+</span></span><span style="display:flex;"><span>    <span style="color:#2b91af">uint32_t</span> offset;
+</span></span><span style="display:flex;"><span>    string path;
+</span></span><span style="display:flex;"><span>} SRIndexEntry;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#00f">struct</span> {
+</span></span><span style="display:flex;"><span>    LittleEndian();
+</span></span><span style="display:flex;"><span>    <span style="color:#00f">while</span>(!FEof()) {
+</span></span><span style="display:flex;"><span>        SRIndexEntry index;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>} x;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="music">Music</h2>
+<p>The game&rsquo;s music is stored as <a href="https://en.wikipedia.org/wiki/DirectMusic">DirectMusic</a> SGP files.
+This is a sequenced format which can be opened in <a href="https://archive.org/details/dmp-9">DirectMusic Producer 9</a>.</p>
+<h2 id="file-info">File Info</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Size</th>
+<th>SHA1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>res/ART0001.RFH</code></td>
+<td>298924</td>
+<td><code>b16d66dc9ddb2c28bc64978955ae6bd11a3df82e</code></td>
+</tr>
+<tr>
+<td><code>res/ART0001.RFD</code></td>
+<td>78815447</td>
+<td><code>2a2e8715e2782ced8ce9112defbf97d3c71bb659</code></td>
+</tr>
+<tr>
+<td><code>res/CITY0001.RFH</code></td>
+<td>29270</td>
+<td><code>575b234c539bf7d68770cccf257fb569643f66ee</code></td>
+</tr>
+<tr>
+<td><code>res/CITY0001.RFD</code></td>
+<td>1091397</td>
+<td><code>4dd020711bfe235a0aba9639841da30583674da7</code></td>
+</tr>
+<tr>
+<td><code>res/DESERT0001.RFH</code></td>
+<td>23346</td>
+<td><code>cc718a15e41d234e9dfa1aa95c06bebab67eff6c</code></td>
+</tr>
+<tr>
+<td><code>res/DESERT0001.RFD</code></td>
+<td>1393167</td>
+<td><code>b44f7bdbde9c7408e3be0d106c2f40bef323641b</code></td>
+</tr>
+<tr>
+<td><code>res/ICE0001.RFH</code></td>
+<td>26406</td>
+<td><code>aca77e2e24abfaeb6530de1d77e737d0e4dbaa2f</code></td>
+</tr>
+<tr>
+<td><code>res/ICE0001.RFD</code></td>
+<td>1324889</td>
+<td><code>c8e80ae80d09e6cabe4697db16ff7c7518cf28ae</code></td>
+</tr>
+<tr>
+<td><code>res/JUNGLE0001.RFH</code></td>
+<td>24749</td>
+<td><code>09ea94e02273cdf2f3d7b2bceb52abecd6cf754b</code></td>
+</tr>
+<tr>
+<td><code>res/JUNGLE0001.RFD</code></td>
+<td>1681960</td>
+<td><code>5b28fef47e0bd9db4e16b4757b4d39fc0a75166a</code></td>
+</tr>
+<tr>
+<td><code>res/SPEECH0001.RFH</code></td>
+<td>8508</td>
+<td><code>048630fa75824e7032f009384e868499b42ba15a</code></td>
+</tr>
+<tr>
+<td><code>res/SPEECH0001.RFD</code></td>
+<td>9698913</td>
+<td><code>dd74b30c21aff48fd106d0abe621edf496488b9e</code></td>
+</tr>
+<tr>
+<td><code>res/TEXT0001.RFH</code></td>
+<td>5245</td>
+<td><code>d2bc5bc37cb279f49830cc365bbf465aac6628a0</code></td>
+</tr>
+<tr>
+<td><code>res/TEXT0001.RFD</code></td>
+<td>3528</td>
+<td><code>029de4d1f63a7b3b747bab86cbb75fc1081c2f78</code></td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>

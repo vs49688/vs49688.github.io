@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="canonical" href="https://zanevaniperen.com/kb/0005-mdraid-destroyed-on-reboot/">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>mdraid destroyed on reboot</title>
+    <meta name="description" content="mdraid destroy on reboot">
+    <meta name="author" content="Zane van Iperen">
+    <meta name="keywords" content="linux, mdraid, raid, asrock">
+    <link rel="stylesheet" href="/css/combined.min.css">
+</head>
+
+    <body><div class="container mt-5">
+    <nav class="navbar navbar-expand-sm flex-column flex-sm-row text-nowrap p-0">
+        <a class="navbar-brand mx-0 mr-sm-auto" href="https://zanevaniperen.com/" title="Zane van Iperen">
+          
+          Zane van Iperen
+        </a>
+        <div class="navbar-nav flex-row flex-wrap justify-content-center">
+            
+                
+                
+                    <a class="nav-item nav-link" href="/" title="GPG">
+                        GPG
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/kb" title="KB">
+                        KB
+                    </a>
+                    
+                        <span class="nav-item navbar-text mx-1">/</span>
+                    
+                
+                    <a class="nav-item nav-link" href="/cv.pdf" title="CV">
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-earmark-person-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2 2a2 2 0 0 1 2-2h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm7.5 1.5v-2l3 3h-2a1 1 0 0 1-1-1zM11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm2 5.755S12 12 8 12s-5 1.755-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-.245z"/></svg>CV
+                    </a>
+                    
+                
+            
+        </div>
+    </nav>
+</div>
+<hr>
+<div id="content">
+<div class="container">
+    <header>
+        <h1> mdraid destroyed on reboot</h1>
+        <hr>
+        
+        <i>2020-03-08</i>
+        
+        <hr>
+    </header>
+
+    <p>Certain AsRock motherboards will see a &ldquo;corrupted&rdquo; GPT and helpfully repair it on boot from the backup one, breaking the RAID.</p>
+<p>This only happens when using the device <code>/dev/sdX</code> and not a partition <code>/dev/sdXY</code> for the RAID.</p>
+<p>Symptom:</p>
+<pre tabindex="0"><code>root@CAPRICA ~ $ parted /dev/sde
+GNU Parted 3.2
+Using /dev/sde
+Welcome to GNU Parted! Type &#39;help&#39; to view a list of commands.
+(parted) print
+Error: The primary GPT table is corrupt, but the backup appears OK, so that will be used.
+OK/Cancel? OK
+Model: ATA ST6000VN0041-2EL (scsi)
+Disk /dev/sde: 6001GB
+Sector size (logical/physical): 512B/4096B
+Partition Table: gpt
+Disk Flags:
+
+Number  Start  End  Size  File system  Name  Flags
+
+(parted)
+</code></pre><p>Bad Drive:</p>
+<pre tabindex="0"><code>root@CAPRICA ~ $ wipefs /dev/sde
+DEVICE OFFSET        TYPE              UUID                                 LABEL
+sde    0x1000        linux_raid_member 84165006-f1cb-589c-4be0-8787df8a2611 LUNA:0
+sde    0x57541e95e00 gpt
+sde    0x1fe         PMBR
+</code></pre><p>Good Drive:</p>
+<pre tabindex="0"><code>root@CAPRICA ~ $ wipefs /dev/sdf
+DEVICE OFFSET TYPE              UUID                                 LABEL
+sdf    0x1000 linux_raid_member 84165006-f1cb-589c-4be0-8787df8a2611 LUNA:0
+</code></pre><p>Wipe the gpt and PMBR:</p>
+<pre tabindex="0"><code>root@CAPRICA ~ $ wipefs --backup --force -o 0x57541e95e00 /dev/sde
+/dev/sde: 8 bytes were erased at offset 0x57541e95e00 (gpt): 45 46 49 20 50 41 52 54
+
+root@CAPRICA ~ $ wipefs --backup --force -o 0x1fe /dev/sde
+/dev/sde: 2 bytes were erased at offset 0x000001fe (PMBR): 55 aa
+</code></pre>
+</div>
+
+        </div><div id="footer" class="mb-5">
+    <hr>
+    <div class="container text-center">
+        
+            <a href="mailto:web@zanevaniperen.com" class="fas fa-envelope fa-1x" title="Email"></a>
+        
+            <a href="/zane-pubkey.asc" class="fas fa-key fa-1x" title="GPG Key"></a>
+        
+            <a href="https://gitlab.com/vs49688" class="fab fa-gitlab fa-1x" title="GitLab"></a>
+        
+            <a href="https://github.com/vs49688" class="fab fa-github fa-1x" title="GitHub"></a>
+        
+            <a href="https://www.linkedin.com/in/zane-van-iperen" class="fab fa-linkedin fa-1x" title="LinkedIn"></a>
+        
+    </div>
+    
+</div>
+</body>
+</html>
